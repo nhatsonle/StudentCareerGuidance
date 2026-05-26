@@ -1,16 +1,28 @@
-# Run and deploy your AI Studio app
+# Student Career Guidance
 
-This contains everything you need to run your app locally.
+Interactive IT career assessment, roadmap learning paths, and mentor-style guidance for students.
 
-View your app in AI Studio: https://ai.studio/apps/211fdac8-ab34-4d01-9af9-fd5eb66c03ac
+## Current Behavior
+
+- The assessment flow is fully rule-based and runs on the local Express server.
+- The Career Mentor Chat uses hard-coded keyword responses from the local server.
+- No Gemini API calls are made anywhere in the app.
+- No `GEMINI_API_KEY` or external AI API configuration is required.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Run the app:
    `npm run dev`
+3. Open:
+   `http://localhost:3000`
+
+## Useful Commands
+
+- Type-check the app:
+  `npm run lint`
+- Build for production:
+  `npm run build`

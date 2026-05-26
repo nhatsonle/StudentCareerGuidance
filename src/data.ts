@@ -425,11 +425,11 @@ export const careerPathsData: Record<string, CareerPathData> = {
             id: "m-ai-4",
             title: "Generative AI, Prompt Engineering & RAG Systems",
             duration: "4 - 5 Tuần",
-            description: "Phát triển ứng dụng hỏi đáp dựa trên tri thức riêng của doanh nghiệp sử dụng cơ sở dữ liệu Vector và các API hiện đại nhất của Gemini.",
+            description: "Phát triển ứng dụng hỏi đáp dựa trên tri thức riêng của doanh nghiệp sử dụng cơ sở dữ liệu Vector và các API LLM hiện đại.",
             checklist: ["Thành thạo kỹ nghệ thiết kế Prompt (Prompt Engineering) chất lượng cao", "Xây dựng hệ thống RAG (Retrieval-Augmented Generation) kết nối PDF riêng tư", "Sử dụng Vector Database như Pinecone hoặc ChromaDB để lưu trữ vector đặc trưng", "Tìm hiểu quy trình tinh chỉnh Fine-tuning LLM cơ bản"],
             resources: [
               { title: "DeepLearning.AI - Các khóa học ngắn hạn Generative AI cực hay", type: "Docs", link: "https://www.deeplearning.ai/" },
-              { title: "Project: Xây dựng Chatbot hỏi đáp Quy chế Trường học thông minh (Next.js + Gemini API)", type: "Project", link: "#" }
+              { title: "Project: Xây dựng Chatbot hỏi đáp Quy chế Trường học thông minh (Next.js + LLM API)", type: "Project", link: "#" }
             ]
           }
         ]

@@ -2,5 +2,5 @@
   "name": "IT Career Roadmap",
   "description": "Interactive IT career assessment, roadmap learning paths, and personalized AI mentor guidance for students.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

@@ -21,6 +21,7 @@ import { AssessmentQuestion, CareerRecommendation } from "../types";
 
 interface AssessmentCenterProps {
   onRecommendationReceived: (recommendation: CareerRecommendation) => void;
+  onRestartAssessment: () => void;
   activeRecommendation: CareerRecommendation | null;
   setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
   setSelectedPathId: (pathId: string) => void;
@@ -28,6 +29,7 @@ interface AssessmentCenterProps {
 
 export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({
   onRecommendationReceived,
+  onRestartAssessment,
   activeRecommendation,
   setActiveTab,
   setSelectedPathId,
@@ -44,6 +46,11 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({
     setCurrentStep(0);
     setSelectedOptions({});
     setSubmitError(null);
+  };
+
+  const handleRestartQuiz = () => {
+    onRestartAssessment();
+    handleStartQuiz();
   };
 
   const handleSelectOption = (questionId: string, optionIndex: number) => {
@@ -121,6 +128,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({
 
       const data: CareerRecommendation = await response.json();
       onRecommendationReceived(data);
+      setQuizStarted(false);
     } catch (error: any) {
       console.error("Submission failed:", error);
       setSubmitError(error.message || "Đã xảy ra lỗi ngoài ý muốn. Vui lòng nhấn gửi lại.");
@@ -225,7 +233,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({
 
             <p className="text-sm text-slate-650 leading-relaxed max-w-lg mx-auto font-medium">
               Không còn loay hoay tự hỏi &ldquo;Học IT nên chọn hướng đi nào?&rdquo;. Hãy trải nghiệm khảo sát trắc nghiệm phản xạ năng lực gồm 6 câu hỏi tình huống thực tế của chúng tôi. 
-              Thuật toán ma trận kết hợp <strong>Gemini AI</strong> sẽ vạch ra chiếc la bàn chuẩn xác nhất cho tương lai của bạn.
+              Thuật toán ma trận rule-based sẽ vạch ra chiếc la bàn chuẩn xác nhất cho tương lai của bạn.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-4">
@@ -582,7 +590,7 @@ export const AssessmentCenter: React.FC<AssessmentCenterProps> = ({
 
             <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
               <button
-                onClick={handleStartQuiz}
+                onClick={handleRestartQuiz}
                 className="flex items-center space-x-1 px-4 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 hover:text-slate-900 transition-colors cursor-pointer bg-white"
               >
                 <RefreshCw className="h-3.5 w-3.5" />

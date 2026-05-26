@@ -93,6 +93,10 @@ export default function App() {
     setSelectedPathId(recommendation.matchedDomain);
   };
 
+  const handleRestartAssessment = () => {
+    setActiveRecommendation(null);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-500/20 selection:text-blue-900 relative">
       {/* Modern dot grid background pattern */}
@@ -122,6 +126,7 @@ export default function App() {
         {activeTab === "assessment" && (
           <AssessmentCenter
             onRecommendationReceived={handleRecommendationReceived}
+            onRestartAssessment={handleRestartAssessment}
             activeRecommendation={activeRecommendation}
             setActiveTab={setActiveTab}
             setSelectedPathId={setSelectedPathId}

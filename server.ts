@@ -1,41 +1,11 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, Type } from "@google/genai";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-
-// Initialize Gemini Client Lazily
-let genAI: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-    console.warn("WARNING: GEMINI_API_KEY is not set or contains the placeholder. Running in Offline Rule-Based Fallback mode.");
-    return null;
-  }
-  if (!genAI) {
-    try {
-      genAI = new GoogleGenAI({
-        apiKey: apiKey,
-        httpOptions: {
-          headers: {
-            "User-Agent": "aistudio-build",
-          },
-        },
-      });
-    } catch (error) {
-      console.error("Failed to initialize GoogleGenAI client:", error);
-      return null;
-    }
-  }
-  return genAI;
-}
 
 // Technical assessment scoring matrix for offline rule-based fallback
 interface OfflineRecommendation {
@@ -263,7 +233,7 @@ function generateDynamicOfflineRecommendation(
 }
 
 // API Endpoint to analyze dynamic assessment
-app.post("/api/analyze-assessment", async (req, res) => {
+app.post("/api/analyze-assessment", (req, res) => {
   const { answers } = req.body; // Array of items: { questionId, questionText, selectedOptionText, scoreValue: { web, mobile, ai, embedded, cyber } }
 
   if (!answers || !Array.isArray(answers)) {
@@ -292,146 +262,25 @@ app.post("/api/analyze-assessment", async (req, res) => {
     }
   });
 
-  const clientInstance = getGeminiClient();
-
-  if (!clientInstance) {
-    // Return high-quality dynamic rule-based fallback response
-    const dynamicFallback = generateDynamicOfflineRecommendation(dominantCategory, answers, scores);
-    return res.json({
-      ...dynamicFallback,
-      isAiGenerated: false,
-      scores,
-    });
-  }
-
-  // Construct Gemini Prompt for deep personalization
-  const answersSummary = answers
-    .map((ans: any, idx: number) => `Câu hỏi ${idx + 1}: ${ans.questionText}\nCâu trả lời chọn lọc: ${ans.selectedOptionText}`)
-    .join("\n\n");
-
-  const prompt = `Bạn là một chuyên gia tư vấn hướng nghiệp Công nghệ Thông tin cao cấp với 15 năm kinh nghiệm đồng hành cùng sinh viên IT.
-Hãy phân tích hồ sơ trắc nghiệm năng lực của sinh viên dưới đây và đề xuất 1 định hướng phù hợp nhất trong 5 hướng chính sau:
-- 'web' (Web Developer - Fullstack/Frontend/Backend)
-- 'mobile' (Mobile App Developer)
-- 'ai' (AI/Machine Learning/Data Scientist)
-- 'embedded' (Embedded Systems/IoT/Semiconductors)
-- 'cyber' (Information Security/Cybersecurity Specialist)
-
-Dựa trên các câu trả lời sau đây của sinh viên:
-${answersSummary}
-
-Các điểm số tính toán cơ học từ hệ thống đối với sinh viên này (tham khảo):
-- Phần mềm Web: ${scores.web} điểm
-- Lập trình Di động: ${scores.mobile} điểm
-- Trí tuệ Nhân tạo / Dữ liệu: ${scores.ai} điểm
-- Hệ thống nhúng / IoT: ${scores.embedded} điểm
-- An ninh mạng: ${scores.cyber} điểm
-
-Hãy phân tích chi tiết bằng Tiếng Việt và điền đầy đủ thông tin vào JSON schema được cung cấp.`;
-
-  try {
-    const response = await clientInstance.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            matchedDomain: {
-              type: Type.STRING,
-              description: "Bắt buộc phải thuộc danh sách: 'web', 'mobile', 'ai', 'embedded', 'cyber'."
-            },
-            percentageMatch: {
-              type: Type.INTEGER,
-              description: "Mức độ phù hợp, là số nguyên từ 70 đến 99."
-            },
-            suitabilityScore: {
-              type: Type.STRING,
-              description: "Điểm ví dụ '9.4/10' hoặc '8.9/10'."
-            },
-            analysisSummary: {
-              type: Type.STRING,
-              description: "Phân tích dài 2-3 câu lý giải cặn kẽ dựa vào cụ thể những câu trả lời họ đã chọn lựa."
-            },
-            prosAndCons: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  pro: { type: Type.STRING },
-                  con: { type: Type.STRING }
-                },
-                required: ["pro", "con"]
-              }
-            },
-            marketOutlook: {
-              type: Type.OBJECT,
-              properties: {
-                demand: { type: Type.STRING },
-                salary: { type: Type.STRING },
-                trends: { type: Type.STRING }
-              },
-              required: ["demand", "salary", "trends"]
-            },
-            actionableTips: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING }
-            },
-            customMessage: {
-              type: Type.STRING,
-              description: "Lời khuyên tiếp lửa đam mê từ giảng viên cao cấp."
-            }
-          },
-          required: [
-            "matchedDomain",
-            "percentageMatch",
-            "suitabilityScore",
-            "analysisSummary",
-            "prosAndCons",
-            "marketOutlook",
-            "actionableTips",
-            "customMessage"
-          ]
-        }
-      },
-    });
-
-    const resText = response.text || "";
-    const parsedData = JSON.parse(resText.trim());
-
-    return res.json({
-      ...parsedData,
-      isAiGenerated: true,
-      scores,
-    });
-  } catch (error) {
-    console.error("Gemini AI API analysis failed, turning back to server rule-based recommendation:", error);
-    // Dynamic rule-based fallback inside catch block as well
-    const dynamicFallback = generateDynamicOfflineRecommendation(dominantCategory, answers, scores);
-    return res.json({
-      ...dynamicFallback,
-      isAiGenerated: false,
-      scores,
-      aiError: true,
-    });
-  }
+  const dynamicFallback = generateDynamicOfflineRecommendation(dominantCategory, answers, scores);
+  return res.json({
+    ...dynamicFallback,
+    isAiGenerated: false,
+    scores,
+  });
 });
 
 // API Endpoint for Career Mentor AI Chat
-app.post("/api/chat-mentor", async (req, res) => {
-  const { messages, userProfile } = req.body; // messages: [{ role: "user" | "model", content: string }], userProfile: optional string
+app.post("/api/chat-mentor", (req, res) => {
+  const { messages } = req.body; // messages: [{ role: "user" | "model", content: string }]
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "Messages array is required." });
   }
 
-  const clientInstance = getGeminiClient();
-
-  if (!clientInstance) {
-    // Return standard friendly offline guidance responses based on keywords in user message
-    const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
-    let reply = "";
+  // Return standard friendly offline guidance responses based on keywords in user message
+  const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
+  let reply = "";
 
     if (lastUserMessage.includes("chào") || lastUserMessage.includes("hi") || lastUserMessage.includes("hello")) {
       reply = "Xin chào! Mình là **EduMentor AI**. Mình rất vui được hỗ trợ và giải đáp tất cả thắc mắc của bạn về lộ trình học tập, cơ hội nghề nghiệp, phân tích năng lực hoặc lựa chọn công nghệ trong ngành IT. Bạn muốn tìm hiểu kỹ hơn về hướng đi nào (Web, Mobile, AI, Nhúng, hay Security)?";
@@ -449,50 +298,11 @@ app.post("/api/chat-mentor", async (req, res) => {
       reply = "Cảm ơn câu hỏi tuyệt vời của bạn! Trong lộ trình rèn luyện IT, kỹ năng quan trọng nhất chính là khả năng tự học sâu (Deep Work) kết hợp với các dự án thực tế. Bạn hãy thử làm một đồ án nhỏ (Pet Project) áp dụng công nghệ đó, đó là cách thuyết phục nhất trong mắt các nhà tuyển dụng. Bạn có muốn mình đưa gợi ý ý tưởng dự án thực hành cụ thể nào không?";
     }
 
-    return res.json({
-      reply,
-      isAiGenerated: false,
-    });
-  }
+  return res.json({
+    reply,
+    isAiGenerated: false,
+  });
 
-  // AI-Powered Conversations
-  try {
-    // Structure chat context
-    const profileContext = userProfile 
-      ? `Bối cảnh người học: Họ đang có hứng thú/được xếp hạng cao ở ngành: ${userProfile}.` 
-      : "";
-
-    const systemInstruction = `Bạn là "EduMentor AI", một trợ lý tư vấn hướng nghiệp IT tận tâm, thông thái và am hiểu sâu sắc hệ sinh thái công nghệ toàn cầu và Việt Nam.
-${profileContext}
-Nhiệm vụ của bạn là giải đáp các câu hỏi học tập, kỹ thuật, lựa chọn công nghệ, kinh nghiệm phỏng vấn của học sinh sinh viên một cách trực diện, rõ ràng, giàu tính định hướng thực tiễn và đặc biệt truyền cảm hứng cực tốt.
-Hãy viết câu trả lời bằng Markdown đẹp mắt, sử dụng các tiêu đề phụ, danh sách gạch đầu dòng, viết in đậm các từ khóa công nghệ quan trọng (ví dụ **React**, **Python**, **C++**) để giúp sinh viên dễ dàng quét thông tin trực quan. Trả lời bằng Tiếng Việt (hoặc Tiếng Anh nếu người dùng hỏi bằng Tiếng Anh).`;
-
-    // Map message roles securely to @google/genai format
-    // GoogleGenAI chat expects 'user' and 'model' as roles
-    const formattedContents = messages.map(msg => ({
-      role: msg.role === "assistant" ? "model" as const : "user" as const,
-      parts: [{ text: msg.content }]
-    }));
-
-    const response = await clientInstance.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: formattedContents,
-      config: {
-        systemInstruction: systemInstruction,
-      }
-    });
-
-    return res.json({
-      reply: response.text || "Xin lỗi bạn, mình không trích xuất được phản hồi phù hợp. Hãy thử hỏi lại nhé!",
-      isAiGenerated: true
-    });
-  } catch (error) {
-    console.error("Gemini AI Chat error, serving fallback reply:", error);
-    return res.status(500).json({
-      error: "Failed to fetch response from Gemini AI. Please check server logs or secret configuration.",
-      fallbackReply: "Mình đang gặp một chút gián đoạn kết nối với bộ não AI. Bạn có thể thử lại trong chốc lát, hoặc hỏi mình về các chủ đề phổ biến khác nhé!"
-    });
-  }
 });
 
 // Setup Vite in Development or Static Server in Production
