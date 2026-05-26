@@ -157,6 +157,111 @@ const offlineRecommendations: Record<string, OfflineRecommendation> = {
   },
 };
 
+// High-quality dynamic rule-based fallback generator
+function generateDynamicOfflineRecommendation(
+  dominantCategory: "web" | "mobile" | "ai" | "embedded" | "cyber",
+  answers: any[],
+  scores: Record<string, number>
+): OfflineRecommendation {
+  const base = offlineRecommendations[dominantCategory];
+  
+  // Calculate dynamic percentageMatch and suitabilityScore based on relative prominence of maximum score
+  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+  const maxScore = scores[dominantCategory];
+  let percentageMatch = 85;
+  if (totalScore > 0) {
+    percentageMatch = Math.min(99, Math.max(70, Math.round((maxScore / totalScore) * 35 + 63)));
+  }
+  const suitabilityScore = `${(percentageMatch / 10).toFixed(1)}/10`;
+
+  // Build a highly customized, dynamic analysis summary based on their answers
+  let dynamicAnalysis = `Hệ thống ghi nhận xu hướng nổi trội của bạn tập trung ở nhóm kỹ năng ${
+    dominantCategory === "web" ? "Phát triển Phần mềm Web" :
+    dominantCategory === "mobile" ? "Lập trình Di động" :
+    dominantCategory === "ai" ? "Trí tuệ Nhân tạo & ML" :
+    dominantCategory === "embedded" ? "Hệ thống Nhúng & IoT" :
+    "An ninh mạng & Bảo mật"
+  }. `;
+
+  const q1Ans = answers.find((a: any) => a.questionId === "q1")?.selectedOptionText || "";
+  const q2Ans = answers.find((a: any) => a.questionId === "q2")?.selectedOptionText || "";
+  const q3Ans = answers.find((a: any) => a.questionId === "q3")?.selectedOptionText || "";
+  const q4Ans = answers.find((a: any) => a.questionId === "q4")?.selectedOptionText || "";
+
+  const personalPoints: string[] = [];
+
+  if (q1Ans.toLowerCase().includes("website") || q1Ans.toLowerCase().includes("triệu người")) {
+    personalPoints.push("Ước mơ của bạn hướng tới dựng xây hệ thống Web quy mô lớn, giao diện mượt tốc độ cao.");
+  } else if (q1Ans.toLowerCase().includes("di động") || q1Ans.toLowerCase().includes("sức khỏe")) {
+    personalPoints.push("Bạn thích thiết kế các ứng dụng nằm gọn trong điện thoại của hàng triệu người dùng.");
+  } else if (q1Ans.toLowerCase().includes("ai") || q1Ans.toLowerCase().includes("tài chính")) {
+    personalPoints.push("Bạn có khao khát ứng dụng học máy vào phân tích mảng dữ liệu tài chính vĩ mô.");
+  } else if (q1Ans.toLowerCase().includes("nhà thông minh") || q1Ans.toLowerCase().includes("cảm biến")) {
+    personalPoints.push("Bạn hào hứng phát triển các chương trình điều khiển ngoại vi và phần cứng IoT.");
+  } else if (q1Ans.toLowerCase().includes("quét") || q1Ans.toLowerCase().includes("lỗ hổng")) {
+    personalPoints.push("Bạn sở hữu bản lĩnh kiến tạo các lá chắn rà quét, chặn đứng mọi ý đồ tấn công mạng.");
+  }
+
+  if (q2Ans.toLowerCase().includes("hiển thị") || q2Ans.toLowerCase().includes("ui/ux")) {
+    personalPoints.push("Trải nghiệm trực quan mỹ thuật và sự nhịp nhàng phía client chính là chiếc neo cảm hứng cực tốt của bạn.");
+  } else if (q2Ans.toLowerCase().includes("máy chủ") || q2Ans.toLowerCase().includes("api")) {
+    personalPoints.push("Bạn yêu thích chiều sâu logic của dữ liệu server, các API phân tán và tối ưu hóa hệ thống.");
+  } else if (q2Ans.toLowerCase().includes("mô hình") || q2Ans.toLowerCase().includes("mạng nơ-ron")) {
+    personalPoints.push("Nghiên cứu kiến trúc nơ-ron học sâu để máy tự phản xạ chính là con đường bạn hướng tới.");
+  } else if (q2Ans.toLowerCase().includes("bo mạch") || q2Ans.toLowerCase().includes("driver")) {
+    personalPoints.push("Bạn có xu hướng làm việc sát sườn cùng bo mạch vi xử lý, thấu hiểu cấu trúc chip và thanh ghi.");
+  } else if (q2Ans.toLowerCase().includes("phòng thủ") || q2Ans.toLowerCase().includes("quét gói tin")) {
+    personalPoints.push("Bảo an dữ liệu từ tầng sơ khai đến mã hóa nâng cao là phân vùng bạn muốn bảo vệ.");
+  }
+
+  if (q3Ans.toLowerCase().includes("javascript") || q3Ans.toLowerCase().includes("react")) {
+    personalPoints.push("Sự hỗ trợ mạnh mẽ của hệ sinh thái Javascript mang lại bệ phóng tốt nhất cho bạn.");
+  } else if (q3Ans.toLowerCase().includes("dart") || q3Ans.toLowerCase().includes("kotlin")) {
+    personalPoints.push("Mã nguồn Flutter/Native gọn gàng thúc đẩy năng lực sáng chế ứng dụng di động tuyệt hảo.");
+  } else if (q3Ans.toLowerCase().includes("python") || q3Ans.toLowerCase().includes("pytorch")) {
+    personalPoints.push("Sức mạnh tính toán của Python và Jupyter Notebook chính là người bạn đồng hành của bạn.");
+  } else if (q3Ans.toLowerCase().includes("c/c++") || q3Ans.toLowerCase().includes("thanh ghi")) {
+    personalPoints.push("Bạn chuộng sự kiểm soát bộ nhớ thủ công tuyệt đối của lập trình C/C++ thuần túy.");
+  } else if (q3Ans.toLowerCase().includes("linux") || q3Ans.toLowerCase().includes("terminal")) {
+    personalPoints.push("Sử dụng terminal Linux và công cụ soi gói tin mạng phản ánh chính xác lối tư duy hệ thống của bạn.");
+  }
+
+  if (q4Ans.toLowerCase().includes("render") || q4Ans.toLowerCase().includes("api")) {
+    personalPoints.push("Khi giải quyết sự cố, bạn khéo léo gác chặn API và kiểm định lỗi giao diện ngay lập tức.");
+  } else if (q4Ans.toLowerCase().includes("nhật ký") || q4Ans.toLowerCase().includes("ram")) {
+    personalPoints.push("Bạn bền bỉ phân tích nhật ký rò rỉ bộ nhớ thực tế trên thiết bị để đảm bảo độ mượt tối ưu.");
+  } else if (q4Ans.toLowerCase().includes("siêu tham số")) {
+    personalPoints.push("Phong thái gỡ lỗi khoa học giúp bạn nắn chỉnh siêu tham số mô hình toán học kiên định.");
+  } else if (q4Ans.toLowerCase().includes("nguồn") || q4Ans.toLowerCase().includes("ic")) {
+    personalPoints.push("Bạn kiên trì đo đạc tín hiệu vật lý xung quanh và sơ đồ chân cắm chống nhiễu phần cứng.");
+  } else if (q4Ans.toLowerCase().includes("khai thác") || q4Ans.toLowerCase().includes("mã độc")) {
+    personalPoints.push("Bạn có nhãn quan thám tử nhạy bén tìm kiếm nguy cơ bị lợi dụng lỗ hổng xâm nhập hệ thống.");
+  }
+
+  if (personalPoints.length > 0) {
+    dynamicAnalysis += personalPoints.join(" ") + " ";
+  }
+
+  dynamicAnalysis += base.analysisSummary;
+
+  const actionableTips = [...base.actionableTips];
+  if (q3Ans) {
+    const languageName = q3Ans.split(" - ")[0] || "ngôn ngữ yêu thích";
+    actionableTips.unshift(`Phát triển vững chắc kỹ năng sử dụng công cụ/ngôn ngữ ưu tiên chính của bạn: ${languageName}.`);
+  }
+
+  return {
+    matchedDomain: dominantCategory,
+    percentageMatch,
+    suitabilityScore,
+    analysisSummary: dynamicAnalysis,
+    prosAndCons: base.prosAndCons,
+    marketOutlook: base.marketOutlook,
+    actionableTips: actionableTips.slice(0, 3),
+    customMessage: base.customMessage,
+  };
+}
+
 // API Endpoint to analyze dynamic assessment
 app.post("/api/analyze-assessment", async (req, res) => {
   const { answers } = req.body; // Array of items: { questionId, questionText, selectedOptionText, scoreValue: { web, mobile, ai, embedded, cyber } }
@@ -187,13 +292,13 @@ app.post("/api/analyze-assessment", async (req, res) => {
     }
   });
 
-  const fallbackData = offlineRecommendations[dominantCategory];
   const clientInstance = getGeminiClient();
 
   if (!clientInstance) {
-    // Return high-quality rule-based fallback response
+    // Return high-quality dynamic rule-based fallback response
+    const dynamicFallback = generateDynamicOfflineRecommendation(dominantCategory, answers, scores);
     return res.json({
-      ...fallbackData,
+      ...dynamicFallback,
       isAiGenerated: false,
       scores,
     });
@@ -222,30 +327,7 @@ Các điểm số tính toán cơ học từ hệ thống đối với sinh viê
 - Hệ thống nhúng / IoT: ${scores.embedded} điểm
 - An ninh mạng: ${scores.cyber} điểm
 
-Hãy trả về một phản hồi phân tích chi tiết bằng Tiếng Việt dưới dạng cấu trúc JSON đúng chuẩn chính xác (không kèm bất kỳ văn bản giải thích thừa nào bên ngoài cặp ngoặc JSON).
-
-Cấu trúc JSON phản hồi bắt buộc phải có đủ các trường sau:
-{
-  "matchedDomain": "web" | "mobile" | "ai" | "embedded" | "cyber" (nhập đúng 1 trong các từ khóa này phù hợp nhất),
-  "percentageMatch": (mức độ phù hợp, là số nguyên từ 70 đến 99),
-  "suitabilityScore": (là chuỗi đánh giá điểm ví dụ "9.4/10" hoặc "8.9/10"),
-  "analysisSummary": "phân tích chuyên sâu cá nhân hóa lý giải tại sao kết quả trắc nghiệm lại chỉ ra họ phù hợp nhất với ngành này, dựa vào cụ thể những câu trả lời họ đã chọn",
-  "prosAndCons": [
-    {"pro": "điểm tích cực 1", "con": "thách thức tương ứng 1"},
-    {"pro": "điểm tích cực 2", "con": "thách thức tương ứng 2"}
-  ],
-  "marketOutlook": {
-    "demand": "nhu cầu tuyển dụng hiện nay và tương lai của thị trường",
-    "salary": "mức lương khởi điểm và lộ trình thăng tiến thông tin tham khảo bằng VNĐ",
-    "trends": "xu hướng công nghệ mới nổi nổi bật đáng chú ý trong định hướng này"
-  },
-  "actionableTips": [
-    "lời khuyên hành động thực tế 1",
-    "lời khuyên hành động thực tế 2",
-    "lời khuyên hành động thực tế 3"
-  ],
-  "customMessage": "một lời nhắn gửi truyền cảm hứng, động viên đầy năng lượng mang đậm dấu ấn chuyên gia khích lệ tinh thần người học"
-}`;
+Hãy phân tích chi tiết bằng Tiếng Việt và điền đầy đủ thông tin vào JSON schema được cung cấp.`;
 
   try {
     const response = await clientInstance.models.generateContent({
@@ -253,6 +335,65 @@ Cấu trúc JSON phản hồi bắt buộc phải có đủ các trường sau:
       contents: prompt,
       config: {
         responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            matchedDomain: {
+              type: Type.STRING,
+              description: "Bắt buộc phải thuộc danh sách: 'web', 'mobile', 'ai', 'embedded', 'cyber'."
+            },
+            percentageMatch: {
+              type: Type.INTEGER,
+              description: "Mức độ phù hợp, là số nguyên từ 70 đến 99."
+            },
+            suitabilityScore: {
+              type: Type.STRING,
+              description: "Điểm ví dụ '9.4/10' hoặc '8.9/10'."
+            },
+            analysisSummary: {
+              type: Type.STRING,
+              description: "Phân tích dài 2-3 câu lý giải cặn kẽ dựa vào cụ thể những câu trả lời họ đã chọn lựa."
+            },
+            prosAndCons: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  pro: { type: Type.STRING },
+                  con: { type: Type.STRING }
+                },
+                required: ["pro", "con"]
+              }
+            },
+            marketOutlook: {
+              type: Type.OBJECT,
+              properties: {
+                demand: { type: Type.STRING },
+                salary: { type: Type.STRING },
+                trends: { type: Type.STRING }
+              },
+              required: ["demand", "salary", "trends"]
+            },
+            actionableTips: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING }
+            },
+            customMessage: {
+              type: Type.STRING,
+              description: "Lời khuyên tiếp lửa đam mê từ giảng viên cao cấp."
+            }
+          },
+          required: [
+            "matchedDomain",
+            "percentageMatch",
+            "suitabilityScore",
+            "analysisSummary",
+            "prosAndCons",
+            "marketOutlook",
+            "actionableTips",
+            "customMessage"
+          ]
+        }
       },
     });
 
@@ -266,8 +407,10 @@ Cấu trúc JSON phản hồi bắt buộc phải có đủ các trường sau:
     });
   } catch (error) {
     console.error("Gemini AI API analysis failed, turning back to server rule-based recommendation:", error);
+    // Dynamic rule-based fallback inside catch block as well
+    const dynamicFallback = generateDynamicOfflineRecommendation(dominantCategory, answers, scores);
     return res.json({
-      ...fallbackData,
+      ...dynamicFallback,
       isAiGenerated: false,
       scores,
       aiError: true,
