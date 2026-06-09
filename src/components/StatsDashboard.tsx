@@ -13,8 +13,8 @@ import {
   Calendar,
   AlertCircle
 } from "lucide-react";
-import { careerPathsData } from "../data";
 import { CareerRecommendation } from "../types";
+import { getCareerPaths, Language } from "../i18n";
 
 interface StatsDashboardProps {
   selectedPathId: string;
@@ -23,6 +23,7 @@ interface StatsDashboardProps {
   activeRecommendation: CareerRecommendation | null;
   setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
   completionRate: number;
+  language: Language;
 }
 
 export const StatsDashboard: React.FC<StatsDashboardProps> = ({
@@ -32,7 +33,10 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
   activeRecommendation,
   setActiveTab,
   completionRate,
+  language,
 }) => {
+  const isJa = language === "ja";
+  const careerPathsData = getCareerPaths(language);
   const currentPath = careerPathsData[selectedPathId] || careerPathsData.web;
 
   // Retrieve total milestones in current path to evaluate progress
@@ -53,6 +57,13 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
 
   // Adaptive motivational advice
   const getMotivationalText = (rate: number) => {
+    if (isJa) {
+      if (rate === 0) return "素晴らしいスタートです。適性診断を受けるか、「学習を続ける」から最初の章を始めましょう。";
+      if (rate < 30) return "いい流れです。キャリアの土台になる最初の一歩を積み上げています。毎日15分でも継続しましょう。";
+      if (rate < 70) return "順調です。実践課題に取り組むことで、知識がポートフォリオに変わります。";
+      if (rate < 100) return "あと少しで完走です。残りの深掘り milestone を仕上げて、応募できる状態へ近づきましょう。";
+      return "おめでとうございます。ロードマップを完了しました。作品を整えて応募に進める状態です。";
+    }
     if (rate === 0) return "Khởi đầu tuyệt diệu! Hãy kích hoạt bài thi năng lực hoặc bấm nút \"Học Tiếp\" để học chương đầu tiên.";
     if (rate < 30) return "Cực tốt! Bạn đã đặt những viên gạch móng đầu tiên cho sự nghiệp. Hãy duy trì đều đặn 15 phút mỗi ngày nhé.";
     if (rate < 70) return "Phong độ xuất sắc! Bạn đang sở hữu đà tiến bộ vượt trội. Tập trung giải quyết các bài tập thực chiến (Project) nào!";
@@ -85,12 +96,12 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-3">
             <span className="font-mono text-[9px] text-blue-700 uppercase tracking-widest bg-blue-50 px-2.5 py-1 rounded-full border border-blue-105 font-bold">
-              Hệ thống định hướng thông minh
+              {isJa ? "スマートガイダンスシステム" : "Hệ thống định hướng thông minh"}
             </span>
             <h1 className="font-sans font-extrabold text-xl md:text-3xl text-slate-900 tracking-tight leading-normal">
-              Chào mừng bạn đến với <br />
+              {isJa ? "ようこそ" : "Chào mừng bạn đến với"} <br />
               <span className="bg-gradient-to-r from-blue-600 via-indigo-650 to-indigo-500 bg-clip-text text-transparent font-black">
-                Hành Trình Kiến Tạo Kỹ Sư IT
+                {isJa ? "ITエンジニアへの学習ジャーニー" : "Hành Trình Kiến Tạo Kỹ Sư IT"}
               </span>
             </h1>
             <p className="text-xs md:text-sm text-slate-600 max-w-xl font-sans font-medium">
@@ -105,7 +116,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
               className="flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white font-sans font-bold text-xs px-5 py-3 rounded-lg shadow-md shadow-blue-600/10 transition-colors cursor-pointer"
             >
               <Award className="h-4 w-4" />
-              <span>Khảo Sát Năng Lực</span>
+              <span>{isJa ? "適性診断" : "Khảo Sát Năng Lực"}</span>
             </button>
 
             <button
@@ -113,7 +124,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
               onClick={() => setActiveTab("roadmap")}
               className="flex items-center space-x-1.5 bg-white hover:bg-slate-50 border border-slate-205 text-slate-700 font-sans font-bold text-xs px-5 py-3 rounded-lg transition-colors cursor-pointer shadow-xs"
             >
-              <span>Học Tiếp</span>
+              <span>{isJa ? "学習を続ける" : "Học Tiếp"}</span>
               <ArrowRight className="h-4 w-4 text-blue-600" />
             </button>
           </div>
@@ -127,14 +138,14 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-sans font-bold text-xs text-slate-500 uppercase tracking-widest">
-              Tiến trình học hiện tại
+              {isJa ? "現在の進捗" : "Tiến trình học hiện tại"}
             </h3>
             <Flame className="h-4 w-4 text-amber-500 shrink-0" />
           </div>
 
           <div className="flex items-baseline space-x-2">
             <span className="text-3xl font-mono font-black text-slate-900">{completionRate}%</span>
-            <span className="text-xs text-slate-500 font-sans">hoàn thành lộ trình</span>
+            <span className="text-xs text-slate-500 font-sans">{isJa ? "完了" : "hoàn thành lộ trình"}</span>
           </div>
 
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -145,8 +156,8 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
           </div>
 
           <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
-            <span>Hoàn thành: {completedCount}/{totalMilestonesCount} thẻ</span>
-            <span>Ước lượng: {totalMilestonesCount * 4} tuần</span>
+            <span>{isJa ? "完了" : "Hoàn thành"}: {completedCount}/{totalMilestonesCount}</span>
+            <span>{isJa ? "目安" : "Ước lượng"}: {totalMilestonesCount * 4} {isJa ? "週間" : "tuần"}</span>
           </div>
         </div>
 
@@ -155,7 +166,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-sans font-bold text-xs text-slate-500 uppercase tracking-widest">
-                Đích ngắm tiếp theo
+                {isJa ? "次の目標" : "Đích ngắm tiếp theo"}
               </h3>
               <Target className="h-4 w-4 text-blue-600" />
             </div>
@@ -167,7 +178,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono flex items-center space-x-1">
                   <Calendar className="h-3 w-3 shrink-0" />
-                  <span>Dự kiến: {nextMilestone.duration}</span>
+                  <span>{isJa ? "目安" : "Dự kiến"}: {nextMilestone.duration}</span>
                 </span>
                 <span className="text-[10px] text-slate-600 font-sans line-clamp-1 block pt-1">
                   {nextMilestone.description}
@@ -176,7 +187,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
             ) : (
               <div className="flex items-center space-x-1.5 p-2 bg-emerald-50 border border-emerald-100 rounded text-[11px] text-emerald-800">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
-                <span className="font-medium">Chúc mừng! Bạn đã hoàn thành mọi mục tiêu</span>
+                <span className="font-medium">{isJa ? "おめでとうございます。すべての目標を完了しました。" : "Chúc mừng! Bạn đã hoàn thành mọi mục tiêu"}</span>
               </div>
             )}
           </div>
@@ -186,7 +197,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
               onClick={() => setActiveTab("roadmap")}
               className="text-[10px] font-sans font-bold text-blue-600 hover:text-blue-750 flex items-center space-x-1 pt-3 self-start cursor-pointer"
             >
-              <span>Xem chi tiết nội dung</span>
+              <span>{isJa ? "詳細を見る" : "Xem chi tiết nội dung"}</span>
               <ArrowRight className="h-3 w-3" />
             </button>
           )}
@@ -197,7 +208,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-sans font-bold text-xs text-slate-500 uppercase tracking-widest">
-                Hồ sơ định hướng AI/ML
+                {isJa ? "適性プロフィール" : "Hồ sơ định hướng AI/ML"}
               </h3>
               <Sparkles className="h-4 w-4 text-indigo-500 shrink-0" />
             </div>
@@ -217,7 +228,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
             ) : (
               <div className="p-3 bg-blue-50/50 border border-blue-100/60 rounded-lg text-center space-y-2">
                 <p className="text-[10px] text-slate-600 font-sans leading-relaxed">
-                  Bạn chưa thực hiện trắc nghiệm năng lực của EduPathIT.
+                  {isJa ? "EduPathITの適性診断はまだ完了していません。" : "Bạn chưa thực hiện trắc nghiệm năng lực của EduPathIT."}
                 </p>
               </div>
             )}
@@ -228,7 +239,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
               onClick={() => setActiveTab("assessment")}
               className="text-xs font-sans font-bold text-blue-600 hover:text-blue-750 flex items-center space-x-1.5 pt-3 self-start cursor-pointer group"
             >
-              <span>Kiểm định năng lượng ngay</span>
+              <span>{isJa ? "今すぐ診断する" : "Kiểm định năng lượng ngay"}</span>
               <ArrowRight className="h-4 w-4 text-blue-650 group-hover:translate-x-0.5 transition-transform" />
             </button>
           ) : (
@@ -236,7 +247,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
               onClick={() => setActiveTab("assessment")}
               className="text-[10px] font-sans font-bold text-blue-600 hover:text-blue-750 flex items-center space-x-1 pt-3 self-start cursor-pointer"
             >
-              <span>Xem lại chi tiết phân tích</span>
+              <span>{isJa ? "分析を見る" : "Xem lại chi tiết phân tích"}</span>
               <ArrowRight className="h-3 w-3" />
             </button>
           )}
@@ -247,10 +258,10 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
       <div className="space-y-4">
         <div className="space-y-1">
           <h2 className="font-sans font-extrabold text-sm md:text-lg text-slate-900 leading-normal">
-            Bản Đồ 5 Phân Ngành IT Hàng Đầu
+            {isJa ? "主要5分野のITロードマップ" : "Bản Đồ 5 Phân Ngành IT Hàng Đầu"}
           </h2>
           <p className="font-sans text-xs text-slate-500 block">
-            Click vào bất kỳ phân ngành nào dưới đây để lập tức mở khóa sơ đồ học tập và tài liệu học tương ứng.
+            {isJa ? "分野を選ぶと、対応する学習ロードマップと参考資料を開けます。" : "Click vào bất kỳ phân ngành nào dưới đây để lập tức mở khóa sơ đồ học tập và tài liệu học tương ứng."}
           </p>
         </div>
 
@@ -297,7 +308,7 @@ export const StatsDashboard: React.FC<StatsDashboardProps> = ({
                       {path.averageSalary.split("/")[0].trim()}
                     </span>
                     <span className="text-[9px] font-sans font-bold text-blue-600 group-hover:text-blue-750 flex items-center space-x-0.5 shrink-0 transition-colors">
-                      <span>Bắt đầu</span>
+                      <span>{isJa ? "開始" : "Bắt đầu"}</span>
                       <ArrowRight className="h-2.5 w-2.5" />
                     </span>
                   </div>

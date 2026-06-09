@@ -272,7 +272,7 @@ app.post("/api/analyze-assessment", (req, res) => {
 
 // API Endpoint for Career Mentor AI Chat
 app.post("/api/chat-mentor", (req, res) => {
-  const { messages } = req.body; // messages: [{ role: "user" | "model", content: string }]
+  const { messages, language } = req.body; // messages: [{ role: "user" | "model", content: string }]
 
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "Messages array is required." });
@@ -280,8 +280,26 @@ app.post("/api/chat-mentor", (req, res) => {
 
   // Return standard friendly offline guidance responses based on keywords in user message
   const lastUserMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
+  const isJapanese = language === "ja";
   let reply = "";
 
+  if (isJapanese) {
+    if (lastUserMessage.includes("こんにちは") || lastUserMessage.includes("hi") || lastUserMessage.includes("hello")) {
+      reply = "こんにちは。私は **EduMentor AI** です。学習計画、キャリア選択、技術選定、ポートフォリオ作成について相談できます。Web、Mobile、AI、組込み、Securityのどれを深掘りしますか。";
+    } else if (lastUserMessage.includes("web") || lastUserMessage.includes("frontend") || lastUserMessage.includes("backend")) {
+      reply = "**Web開発**は、HTML/CSS/JavaScriptを固めたあと、Frontendなら **React.js/Next.js**、Backendなら **Node.js/Express** やJavaへ進むのがおすすめです。求人が多く、作品として成果を見せやすい分野です。";
+    } else if (lastUserMessage.includes("ai") || lastUserMessage.includes("data") || lastUserMessage.includes("機械学習") || lastUserMessage.includes("人工知能")) {
+      reply = "**AI・Data Science** は、Python、確率統計、線形代数、データ処理が土台です。まずScikit-learnで回帰・分類を実装し、その後PyTorchやLLM/RAGへ進むと学習が安定します。";
+    } else if (lastUserMessage.includes("組込み") || lastUserMessage.includes("embedded") || lastUserMessage.includes("hardware") || lastUserMessage.includes("iot")) {
+      reply = "**組込み・IoT** は、C/C++、レジスタ、通信規格(I2C/SPI/UART)、マイコン実験が中心です。ESP32やSTM32の開発キットでLED、センサー、MQTT通信を小さく作るとよいです。";
+    } else if (lastUserMessage.includes("mobile") || lastUserMessage.includes("モバイル") || lastUserMessage.includes("flutter")) {
+      reply = "**モバイル開発** は、NativeならSwift/Kotlin、Cross-platformなら **Flutter** または **React Native** が候補です。UI/UX、状態管理、API連携、ローカル保存を含むアプリを作ると実力が伝わります。";
+    } else if (lastUserMessage.includes("セキュリティ") || lastUserMessage.includes("security") || lastUserMessage.includes("cyber")) {
+      reply = "**Cybersecurity** は、Linux、TCP/IP、Web、暗号の基礎が重要です。Blue TeamならSOC/SIEM、Red TeamならOWASP Top 10とCTFから始めると、実践力を安全に伸ばせます。";
+    } else {
+      reply = "良い質問です。IT学習で一番効くのは、公式ドキュメントを読みながら小さな実践プロジェクトを完成させることです。興味のある分野を1つ選び、2〜4週間で公開できる作品に落とし込みましょう。";
+    }
+  } else {
     if (lastUserMessage.includes("chào") || lastUserMessage.includes("hi") || lastUserMessage.includes("hello")) {
       reply = "Xin chào! Mình là **EduMentor AI**. Mình rất vui được hỗ trợ và giải đáp tất cả thắc mắc của bạn về lộ trình học tập, cơ hội nghề nghiệp, phân tích năng lực hoặc lựa chọn công nghệ trong ngành IT. Bạn muốn tìm hiểu kỹ hơn về hướng đi nào (Web, Mobile, AI, Nhúng, hay Security)?";
     } else if (lastUserMessage.includes("web") || lastUserMessage.includes("frontend") || lastUserMessage.includes("backend")) {
@@ -297,6 +315,7 @@ app.post("/api/chat-mentor", (req, res) => {
     } else {
       reply = "Cảm ơn câu hỏi tuyệt vời của bạn! Trong lộ trình rèn luyện IT, kỹ năng quan trọng nhất chính là khả năng tự học sâu (Deep Work) kết hợp với các dự án thực tế. Bạn hãy thử làm một đồ án nhỏ (Pet Project) áp dụng công nghệ đó, đó là cách thuyết phục nhất trong mắt các nhà tuyển dụng. Bạn có muốn mình đưa gợi ý ý tưởng dự án thực hành cụ thể nào không?";
     }
+  }
 
   return res.json({
     reply,

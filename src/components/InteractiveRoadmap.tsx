@@ -15,8 +15,8 @@ import {
   Milestone
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { careerPathsData } from "../data";
 import { CareerPathData, MilestoneData, PhaseData } from "../types";
+import { getCareerPaths, Language } from "../i18n";
 
 interface InteractiveRoadmapProps {
   selectedPathId: string;
@@ -24,6 +24,7 @@ interface InteractiveRoadmapProps {
   completedMilestones: string[];
   toggleMilestoneCompletion: (milestoneId: string) => void;
   completionRate: number;
+  language: Language;
 }
 
 export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
@@ -32,8 +33,11 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   completedMilestones,
   toggleMilestoneCompletion,
   completionRate,
+  language,
 }) => {
   const [expandedMilestones, setExpandedMilestones] = useState<Record<string, boolean>>({});
+  const isJa = language === "ja";
+  const careerPathsData = getCareerPaths(language);
 
   const toggleExpand = (milestoneId: string) => {
     setExpandedMilestones((prev) => ({
@@ -117,10 +121,10 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
           <div className="space-y-1">
             <span className="font-mono text-[9px] text-slate-505 uppercase tracking-widest block font-bold">
-              Thư viện lộ trình chi tiết
+              {isJa ? "詳細ロードマップライブラリ" : "Thư viện lộ trình chi tiết"}
             </span>
             <h2 className="font-sans font-bold text-lg md:text-xl text-slate-900">
-              Chọn Lĩnh Vực Để Khám Phá
+              {isJa ? "分野を選んで探索" : "Chọn Lĩnh Vực Để Khám Phá"}
             </h2>
           </div>
 
@@ -164,7 +168,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             {/* Path main tags / technologies bubble */}
             <div className="flex flex-wrap gap-1.5 pt-2">
               <span className="text-[10px] uppercase font-mono tracking-wider font-bold text-slate-500 flex items-center mr-1">
-                Công nghệ cốt lõi:
+                {isJa ? "主要技術:" : "Công nghệ cốt lõi:"}
               </span>
               {currentPath.technologies.map((tech) => (
                 <span
@@ -180,12 +184,12 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           {/* Quick stats panel */}
           <div className="md:col-span-1 p-4 bg-slate-50/50 rounded-xl border border-slate-200 space-y-3.5 flex flex-col justify-center">
             <div>
-              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">Lương trung bình</span>
+              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">{isJa ? "平均収入" : "Lương trung bình"}</span>
               <span className="text-xs font-bold text-slate-800 block font-mono">{currentPath.averageSalary}</span>
             </div>
             <div className="h-[1px] bg-slate-200" />
             <div>
-              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">Triển vọng</span>
+              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">{isJa ? "見通し" : "Triển vọng"}</span>
               <span className="text-xs font-bold text-slate-800 block flex items-center space-x-1">
                 <TrendingUp className={`h-4.5 w-4.5 shrink-0 ${accentStyles.text}`} />
                 <span>{currentPath.outlook}</span>
@@ -193,7 +197,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             </div>
             <div className="h-[1px] bg-slate-200" />
             <div>
-              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">Hoàn thành</span>
+              <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">{isJa ? "完了" : "Hoàn thành"}</span>
               <div className="flex items-center space-x-2 mt-1">
                 <span className={`text-sm font-mono font-bold ${accentStyles.text}`}>{completionRate}%</span>
                 <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -293,7 +297,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                         <div className="flex items-center space-x-2 shrink-0">
                           {isCompleted && (
                             <span className={`text-[9px] font-mono py-0.5 px-2 rounded-full border border-emerald-250 bg-emerald-50 text-emerald-700 font-bold hidden sm:inline`}>
-                              Hoàn thành
+                              {isJa ? "完了" : "Hoàn thành"}
                             </span>
                           )}
                           <button className="text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 transition-colors">
@@ -325,7 +329,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                               {/* Left checklist items block */}
                               <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-2.5 shadow-xs">
                                 <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">
-                                  Nhiệm vụ rèn luyện:
+                                  {isJa ? "学習タスク:" : "Nhiệm vụ rèn luyện:"}
                                 </span>
                                 <div className="space-y-2">
                                   {milestone.checklist.map((bullet, idx) => (
@@ -341,7 +345,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                               <div className="space-y-4">
                                 <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-2.5 shadow-xs">
                                   <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 block font-bold">
-                                    Giáo trình gợi ý học:
+                                    {isJa ? "おすすめ教材:" : "Giáo trình gợi ý học:"}
                                   </span>
                                   <div className="space-y-2">
                                     {milestone.resources.map((res, idx) => (

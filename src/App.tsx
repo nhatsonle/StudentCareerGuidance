@@ -4,12 +4,23 @@ import { StatsDashboard } from "./components/StatsDashboard";
 import { AssessmentCenter } from "./components/AssessmentCenter";
 import { InteractiveRoadmap } from "./components/InteractiveRoadmap";
 import { AIMentorChat } from "./components/AIMentorChat";
-import { careerPathsData } from "./data";
 import { CareerRecommendation, ChatMessage } from "./types";
 import { GraduationCap } from "lucide-react";
+import {
+  getCareerPaths,
+  getInitialAssistantMessage,
+  isLanguage,
+  Language,
+  localizeRecommendation,
+} from "./i18n";
 
 export default function App() {
   // 1. STATE INITIALIZATION (SYNCED WITH LOCALSTORAGE)
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem("edupath_language");
+    return isLanguage(saved) ? saved : "vi";
+  });
+
   const [activeTab, setActiveTab] = useState<"dashboard" | "assessment" | "roadmap" | "chat">(() => {
     const saved = localStorage.getItem("edupath_active_tab");
     return (saved as any) || "dashboard";
@@ -38,13 +49,17 @@ export default function App() {
       {
         id: "welcome-1",
         role: "assistant",
-        content: "Xin chào bạn thân mến! Mình là **EduMentor AI**, trợ lý tư vấn lộ trình học tập và định hướng nghề nghiệp công nghệ thông tin.\n\nMình có thể hỗ trợ giải đáp mọi thắc mắc của bạn về kiến thức lập trình, so sánh các lĩnh vực (Web, Mobile, AI, Hệ thống nhúng, An ninh mạng), tư vấn kỹ năng viết CV nổi bật hay chuẩn bị phỏng vấn tuyển dụng thực chiến.\n\nBạn muốn thảo luận về chủ đề gì trước tiên?",
+        content: getInitialAssistantMessage(language),
         timestamp: new Date()
       }
     ];
   });
 
   // 2. SYNCHRONIZE STATES TO LOCAL STORAGE
+  useEffect(() => {
+    localStorage.setItem("edupath_language", language);
+  }, [language]);
+
   useEffect(() => {
     localStorage.setItem("edupath_active_tab", activeTab);
   }, [activeTab]);
@@ -65,7 +80,21 @@ export default function App() {
     localStorage.setItem("edupath_chat_messages", JSON.stringify(chatMessages));
   }, [chatMessages]);
 
+  useEffect(() => {
+    setChatMessages((prev) => {
+      if (prev.length !== 1 || prev[0].id !== "welcome-1") return prev;
+      return [{ ...prev[0], content: getInitialAssistantMessage(language), timestamp: new Date() }];
+    });
+  }, [language]);
+
+  useEffect(() => {
+    setActiveRecommendation((prev) =>
+      prev ? localizeRecommendation(prev, language) : prev
+    );
+  }, [language]);
+
   // 3. CORE CALCULATION HANDLERS
+  const careerPathsData = getCareerPaths(language);
   const currentPath = careerPathsData[selectedPathId] || careerPathsData.web;
   
   // Calculate completion percentage dynamically based on current list
@@ -88,7 +117,7 @@ export default function App() {
   };
 
   const handleRecommendationReceived = (recommendation: CareerRecommendation) => {
-    setActiveRecommendation(recommendation);
+    setActiveRecommendation(localizeRecommendation(recommendation, language));
     // Auto-update student's active track if they desire
     setSelectedPathId(recommendation.matchedDomain);
   };
@@ -108,6 +137,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         selectedPathId={selectedPathId}
         completionRate={completionRate}
+        language={language}
+        setLanguage={setLanguage}
       />
 
       {/* Central Interactive Module Stage with entry animation limits */}
@@ -120,6 +151,7 @@ export default function App() {
             activeRecommendation={activeRecommendation}
             setActiveTab={setActiveTab}
             completionRate={completionRate}
+            language={language}
           />
         )}
 
@@ -130,6 +162,7 @@ export default function App() {
             activeRecommendation={activeRecommendation}
             setActiveTab={setActiveTab}
             setSelectedPathId={setSelectedPathId}
+            language={language}
           />
         )}
 
@@ -140,6 +173,7 @@ export default function App() {
             completedMilestones={completedMilestones}
             toggleMilestoneCompletion={toggleMilestoneCompletion}
             completionRate={completionRate}
+            language={language}
           />
         )}
 
@@ -148,6 +182,7 @@ export default function App() {
             chatMessages={chatMessages}
             setChatMessages={setChatMessages}
             activeRecommendation={activeRecommendation}
+            language={language}
           />
         )}
       </main>
@@ -157,15 +192,21 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-slate-500">
           <div className="flex items-center space-x-1.5">
             <GraduationCap className="h-4 w-4 text-blue-600" />
-            <span className="font-semibold text-slate-700">EduPathIT Platform &bull; Thiết Kế Cho Sinh Viên Công Nghệ</span>
+            <span className="font-semibold text-slate-700">
+              {language === "ja" ? "EduPathIT Platform • テクノロジー学生のための設計" : "EduPathIT Platform • Thiết Kế Cho Sinh Viên Công Nghệ"}
+            </span>
           </div>
           <span className="font-sans text-[10px]">
-            &copy; {new Date().getFullYear()} Học Viện Định Hướng Nghề Nghiệp IT Thông Minh.
+            &copy; {new Date().getFullYear()} {language === "ja" ? "スマートITキャリアガイダンスアカデミー." : "Học Viện Định Hướng Nghề Nghiệp IT Thông Minh."}
           </span>
           <div className="flex space-x-4">
-            <span className="hover:text-slate-800 hover:underline transition-colors cursor-pointer">Tài liệu hướng nghiệp</span>
+            <span className="hover:text-slate-800 hover:underline transition-colors cursor-pointer">
+              {language === "ja" ? "キャリア資料" : "Tài liệu hướng nghiệp"}
+            </span>
             <span>&bull;</span>
-            <span className="hover:text-slate-800 hover:underline transition-colors cursor-pointer">Trọng số tuyển dụng</span>
+            <span className="hover:text-slate-800 hover:underline transition-colors cursor-pointer">
+              {language === "ja" ? "採用評価基準" : "Trọng số tuyển dụng"}
+            </span>
           </div>
         </div>
       </footer>

@@ -2,26 +2,40 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, Send, Sparkles, User, GraduationCap, Flame, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
 import { ChatMessage, CareerRecommendation } from "../types";
+import { Language } from "../i18n";
 
 interface AIMentorChatProps {
   chatMessages: ChatMessage[];
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   activeRecommendation: CareerRecommendation | null;
+  language: Language;
 }
 
-const quickPrompts = [
-  "So sánh triển vọng cốt lõi giữa ngành AI và Web?",
-  "Tôi muốn bắt đầu học Hệ thống Nhúng thì cần chuẩn bị kit gì?",
-  "Nên học Flutter hay React Native cho lập trình di động?",
-  "Cần chuẩn bị kỹ năng gì để ứng tuyển实习 Cybersecurity?",
-  "Mẹo tự học lập trình hiệu quả cho sinh viên năm nhất?"
-];
+const quickPromptsByLanguage: Record<Language, string[]> = {
+  vi: [
+    "So sánh triển vọng cốt lõi giữa ngành AI và Web?",
+    "Tôi muốn bắt đầu học Hệ thống Nhúng thì cần chuẩn bị kit gì?",
+    "Nên học Flutter hay React Native cho lập trình di động?",
+    "Cần chuẩn bị kỹ năng gì để ứng tuyển thực tập Cybersecurity?",
+    "Mẹo tự học lập trình hiệu quả cho sinh viên năm nhất?"
+  ],
+  ja: [
+    "AIとWebの将来性を比較してください。",
+    "組込みを始めるにはどんな開発キットが必要ですか。",
+    "モバイル開発ではFlutterとReact Nativeのどちらを学ぶべきですか。",
+    "Cybersecurityインターン応募に必要なスキルは何ですか。",
+    "大学1年生向けの効率的なプログラミング独学法を教えてください。"
+  ],
+};
 
 export const AIMentorChat: React.FC<AIMentorChatProps> = ({
   chatMessages,
   setChatMessages,
   activeRecommendation,
+  language,
 }) => {
+  const isJa = language === "ja";
+  const quickPrompts = quickPromptsByLanguage[language];
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -67,11 +81,12 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
         body: JSON.stringify({
           messages: conversationHistory,
           userProfile: activeRecommendation?.matchedDomain || null,
+          language,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Không phản hồi từ máy chủ trí tuệ nhân tạo.");
+        throw new Error(isJa ? "メンターサーバーから応答がありません。" : "Không phản hồi từ máy chủ trí tuệ nhân tạo.");
       }
 
       const data = await response.json();
@@ -87,22 +102,34 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
       ]);
     } catch (err: any) {
       console.error("Chat fetch failed:", err);
-      setSubmitError("Giao thức kết nối bị ngắt quãng. Đang hiển thị kết quả ngoại tuyến.");
+      setSubmitError(isJa ? "接続が不安定です。オフライン回答を表示しています。" : "Giao thức kết nối bị ngắt quãng. Đang hiển thị kết quả ngoại tuyến.");
       
       // Local fallback reply based on keywords
       const lowerText = textToSend.toLowerCase();
-      let fallbackText = "Cảm ơn câu hỏi của bạn! Do kết nối AI bị gián đoạn, EduMentor khuyên bạn nên tập trung tìm kiếm các dự án thực tế trên GitHub và kết hợp đọc các tài liệu hướng dẫn học (Docs) chính thức của thư viện bạn đang học.";
+      let fallbackText = isJa
+        ? "質問ありがとうございます。接続が不安定なため、まずは公式ドキュメントを読みながらGitHubで小さな実践プロジェクトを作ることをおすすめします。"
+        : "Cảm ơn câu hỏi của bạn! Do kết nối AI bị gián đoạn, EduMentor khuyên bạn nên tập trung tìm kiếm các dự án thực tế trên GitHub và kết hợp đọc các tài liệu hướng dẫn học (Docs) chính thức của thư viện bạn đang học.";
       
       if (lowerText.includes("web") || lowerText.includes("next")) {
-        fallbackText = "Về **Lập trình Web**: Đừng quên làm chủ vững vàng **React.js** và **Node.js**. Tập trung xây dựng các RESTful API có phân quyền bảo mật JWT và cơ sở dữ liệu PostgreSQL để làm dự án Portfolio nổi bật.";
-      } else if (lowerText.includes("ai") || lowerText.includes("toán") || lowerText.includes("học máy")) {
-        fallbackText = "Về **AI & Học máy**: Cần ôn tập kỹ các phép toán tích phân, xác suất thống kê và đại số ma trận. Hãy bắt đầu viết code Python cùng thư viện **Scikit-Learn** để giải quyết các bài toán hồi quy phân loại trước khi lao vào Học Sâu (Deep Learning).";
-      } else if (lowerText.includes("nhúng") || lowerText.includes("embedded") || lowerText.includes("esp32")) {
-        fallbackText = "Về **Hệ thống Nhúng**: Cần mua một bộ kit phát triển ESP32 hoặc STM32, tự lập trình C bật tắt led, đọc cảm biến qua I2C/SPI và tìm hiểu hệ điều hành thời gian thực **FreeRTOS** để rèn luyện kỹ năng đa nhiệm.";
-      } else if (lowerText.includes("flutter") || lowerText.includes("di động")) {
-        fallbackText = "Về **Lập trình Di động**: Lựa chọn **Flutter** giúp phát triển nhanh giao diện đẹp cho cả iOS và Android bản địa. Tập trung rèn luyện quản lý State thông minh sử dụng **Riverpod** hoặc **Bloc**.";
-      } else if (lowerText.includes("bảo mật") || lowerText.includes("cyber") || lowerText.includes("security")) {
-        fallbackText = "Về **Cybersecurity**: Gốc rễ nằm ở quản trị hệ thống Linux nâng cao và mạng máy tính CCNA. Hãy dành thời gian giải các đề bài Capture The Flag (CTF) trên TryHackMe để trau dồi phản xạ rà lỗ hổng.";
+        fallbackText = isJa
+          ? "**Web開発**では、React.jsとNode.jsを軸に、JWT認証、REST API、PostgreSQLを含むポートフォリオを作ると強いです。"
+          : "Về **Lập trình Web**: Đừng quên làm chủ vững vàng **React.js** và **Node.js**. Tập trung xây dựng các RESTful API có phân quyền bảo mật JWT và cơ sở dữ liệu PostgreSQL để làm dự án Portfolio nổi bật.";
+      } else if (lowerText.includes("ai") || lowerText.includes("toán") || lowerText.includes("học máy") || lowerText.includes("機械学習")) {
+        fallbackText = isJa
+          ? "**AI・機械学習**では、Python、確率統計、線形代数を固め、Scikit-learnで回帰・分類を作ってからPyTorchへ進むのがおすすめです。"
+          : "Về **AI & Học máy**: Cần ôn tập kỹ các phép toán tích phân, xác suất thống kê và đại số ma trận. Hãy bắt đầu viết code Python cùng thư viện **Scikit-Learn** để giải quyết các bài toán hồi quy phân loại trước khi lao vào Học Sâu (Deep Learning).";
+      } else if (lowerText.includes("nhúng") || lowerText.includes("embedded") || lowerText.includes("esp32") || lowerText.includes("組込み")) {
+        fallbackText = isJa
+          ? "**組込み**では、ESP32またはSTM32の開発キットを用意し、CでLED制御、I2C/SPIセンサー読み取り、FreeRTOSのタスク管理を練習しましょう。"
+          : "Về **Hệ thống Nhúng**: Cần mua một bộ kit phát triển ESP32 hoặc STM32, tự lập trình C bật tắt led, đọc cảm biến qua I2C/SPI và tìm hiểu hệ điều hành thời gian thực **FreeRTOS** để rèn luyện kỹ năng đa nhiệm.";
+      } else if (lowerText.includes("flutter") || lowerText.includes("di động") || lowerText.includes("モバイル")) {
+        fallbackText = isJa
+          ? "**モバイル開発**では、Flutterは短期間で美しいクロスプラットフォームUIを作りやすい選択です。RiverpodやBlocで状態管理を練習しましょう。"
+          : "Về **Lập trình Di động**: Lựa chọn **Flutter** giúp phát triển nhanh giao diện đẹp cho cả iOS và Android bản địa. Tập trung rèn luyện quản lý State thông minh sử dụng **Riverpod** hoặc **Bloc**.";
+      } else if (lowerText.includes("bảo mật") || lowerText.includes("cyber") || lowerText.includes("security") || lowerText.includes("セキュリティ")) {
+        fallbackText = isJa
+          ? "**Cybersecurity**では、Linux管理、TCP/IP、Webの基礎が出発点です。TryHackMeやCTFで安全に脆弱性の仕組みを学びましょう。"
+          : "Về **Cybersecurity**: Gốc rễ nằm ở quản trị hệ thống Linux nâng cao và mạng máy tính CCNA. Hãy dành thời gian giải các đề bài Capture The Flag (CTF) trên TryHackMe để trau dồi phản xạ rà lỗ hổng.";
       }
 
       setChatMessages((prev) => [
@@ -159,13 +186,13 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
               <span className="font-sans font-bold text-sm text-slate-900 block">EduMentor AI</span>
               <span className="font-mono text-[9px] text-emerald-700 tracking-wider flex items-center space-x-1 uppercase font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mr-1" />
-                <span>Trực tuyến cố vấn 24/7</span>
+                <span>{isJa ? "24時間オンラインメンター" : "Trực tuyến cố vấn 24/7"}</span>
               </span>
             </div>
           </div>
           {activeRecommendation && (
             <span className="text-[9px] font-mono tracking-wider bg-blue-50 border border-blue-150 text-blue-705 rounded px-2.5 py-1 uppercase max-w-[150px] truncate font-bold hidden sm:inline">
-              Học Sinh: {activeRecommendation.matchedDomain.toUpperCase()}
+              {isJa ? "学習者" : "Học Sinh"}: {activeRecommendation.matchedDomain.toUpperCase()}
             </span>
           )}
         </div>
@@ -225,7 +252,9 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-550 animate-bounce [animation-delay:-0.15s]" />
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-550 animate-bounce" />
                 </div>
-                <span className="font-sans text-[11px] text-slate-500 font-bold">EduMentor AI đang soạn câu trả lời...</span>
+                <span className="font-sans text-[11px] text-slate-500 font-bold">
+                  {isJa ? "EduMentor AIが回答を作成中..." : "EduMentor AI đang soạn câu trả lời..."}
+                </span>
               </div>
             </div>
           )}
@@ -243,7 +272,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
         {/* Quick suggester chips block */}
         <div className="px-4 py-3 border-t border-slate-200 bg-slate-50/50 shrink-0">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block mb-2 font-bold select-none">
-            Gợi ý chủ đề thường hỏi:
+            {isJa ? "よくある質問:" : "Gợi ý chủ đề thường hỏi:"}
           </span>
           <div className="flex flex-wrap gap-1.5" id="chat-prompts-suggesters">
             {quickPrompts.map((p, idx) => (
@@ -270,7 +299,7 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyPress}
             disabled={isLoading}
-            placeholder="Đặt câu hỏi về học tập, lập trình, xin việc cho EduMentor..."
+            placeholder={isJa ? "学習、プログラミング、就職について質問してください..." : "Đặt câu hỏi về học tập, lập trình, xin việc cho EduMentor..."}
             className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-inner font-medium"
           />
           <button

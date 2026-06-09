@@ -1,12 +1,14 @@
 import React from "react";
-import { GraduationCap, Award, Compass, MessageSquare, Flame } from "lucide-react";
-import { careerPathsData } from "../data";
+import { GraduationCap, Award, Compass, MessageSquare, Flame, Languages } from "lucide-react";
+import { getCareerPaths, Language } from "../i18n";
 
 interface NavbarProps {
   activeTab: "dashboard" | "assessment" | "roadmap" | "chat";
   setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
   selectedPathId: string;
   completionRate: number;
+  language: Language;
+  setLanguage: (language: Language) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -14,8 +16,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   selectedPathId,
   completionRate,
+  language,
+  setLanguage,
 }) => {
+  const careerPathsData = getCareerPaths(language);
   const currentPath = careerPathsData[selectedPathId] || careerPathsData.web;
+  const isJa = language === "ja";
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm px-4 md:px-8">
@@ -30,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               EduPath<span className="bg-gradient-to-r from-blue-600 to-indigo-650 bg-clip-text text-transparent ml-0.5 font-extrabold">IT</span>
             </span>
             <span className="font-mono text-[9px] text-slate-500 block tracking-wider uppercase font-semibold">
-              Cổng Định Hướng Sinh Viên
+              {isJa ? "学生キャリアガイダンス" : "Cổng Định Hướng Sinh Viên"}
             </span>
           </div>
         </div>
@@ -47,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Compass className="h-4 w-4" />
-            <span>Tổng Quan</span>
+            <span>{isJa ? "概要" : "Tổng Quan"}</span>
           </button>
 
           <button
@@ -60,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Award className="h-4 w-4" />
-            <span>Đánh Giá Năng Lực</span>
+            <span>{isJa ? "適性診断" : "Đánh Giá Năng Lực"}</span>
           </button>
 
           <button
@@ -73,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Award className="h-4 w-4" />
-            <span>Sơ Đồ Lộ Trình</span>
+            <span>{isJa ? "ロードマップ" : "Sơ Đồ Lộ Trình"}</span>
           </button>
 
           <button
@@ -86,32 +92,44 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <MessageSquare className="h-4 w-4" />
-            <span>AI Career Mentor</span>
+            <span>{isJa ? "AIメンター" : "AI Career Mentor"}</span>
           </button>
         </nav>
 
-        {/* Current Path Progress Pill */}
-        <div className="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-full py-1.5 pl-3 pr-4 shadow-sm">
-          <div className="flex items-center space-x-1.5">
-            <Flame className="h-4 w-4 text-amber-500 shrink-0" />
-            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 hidden sm:inline">
-              Lộ trình đang học:
-            </span>
-            <span className="text-xs font-sans font-semibold text-slate-800 max-w-[120px] truncate">
-              {currentPath.title.split("(")[0].trim()}
-            </span>
-          </div>
-          <div className="h-4 w-[1px] bg-slate-200" />
-          <div className="flex items-center space-x-1.5">
-            <span className="text-xs font-mono font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              {completionRate}%
-            </span>
-            {/* Visual Ring Micro progress bar */}
-            <div className="w-10 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
-                style={{ width: `${completionRate}%` }}
-              />
+        <div className="flex items-center space-x-2">
+          <button
+            type="button"
+            onClick={() => setLanguage(isJa ? "vi" : "ja")}
+            title={isJa ? "Tiếng Việtに切り替え" : "Chuyển sang tiếng Nhật"}
+            className="flex items-center space-x-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-full py-1.5 px-3 shadow-sm text-xs font-bold text-slate-700 transition-colors"
+          >
+            <Languages className="h-4 w-4 text-blue-600" />
+            <span>{isJa ? "VI" : "日本語"}</span>
+          </button>
+
+          {/* Current Path Progress Pill */}
+          <div className="flex items-center space-x-3 bg-slate-50 border border-slate-200 rounded-full py-1.5 pl-3 pr-4 shadow-sm">
+            <div className="flex items-center space-x-1.5">
+              <Flame className="h-4 w-4 text-amber-500 shrink-0" />
+              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 hidden sm:inline">
+                {isJa ? "学習中:" : "Lộ trình đang học:"}
+              </span>
+              <span className="text-xs font-sans font-semibold text-slate-800 max-w-[120px] truncate">
+                {currentPath.title.split("(")[0].trim()}
+              </span>
+            </div>
+            <div className="h-4 w-[1px] bg-slate-200" />
+            <div className="flex items-center space-x-1.5">
+              <span className="text-xs font-mono font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                {completionRate}%
+              </span>
+              {/* Visual Ring Micro progress bar */}
+              <div className="w-10 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                  style={{ width: `${completionRate}%` }}
+                />
+              </div>
             </div>
           </div>
         </div>
