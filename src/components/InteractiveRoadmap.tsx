@@ -137,7 +137,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   key={p.id}
                   id={`roadmap-select-tab-${p.id}`}
                   onClick={() => handlePathSwitch(p.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                     isActive
                       ? `bg-blue-50 border border-blue-200 text-blue-700 font-bold shadow-xs`
                       : "bg-white border border-slate-200 text-slate-650 hover:text-slate-900 hover:bg-slate-50"
@@ -300,7 +300,7 @@ export const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                               {isJa ? "完了" : "Hoàn thành"}
                             </span>
                           )}
-                          <button className="text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 transition-colors">
+                          <button className="text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 p-1.5 rounded-lg border border-slate-200 transition-colors cursor-pointer">
                             {isExpanded ? (
                               <ChevronUp className="h-3.5 w-3.5" />
                             ) : (

@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-btn-dashboard"
             onClick={() => setActiveTab("dashboard")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
               activeTab === "dashboard"
                 ? "bg-blue-50 text-blue-700 border border-blue-100/80 shadow-sm"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -59,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-btn-assessment"
             onClick={() => setActiveTab("assessment")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
               activeTab === "assessment"
                 ? "bg-blue-50 text-blue-700 border border-blue-100/80 shadow-sm"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -72,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-btn-roadmap"
             onClick={() => setActiveTab("roadmap")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
               activeTab === "roadmap"
                 ? "bg-blue-50 text-blue-700 border border-blue-100/80 shadow-sm"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -85,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             id="nav-btn-chat"
             onClick={() => setActiveTab("chat")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
               activeTab === "chat"
                 ? "bg-blue-50 text-blue-700 border border-blue-100/80 shadow-sm"
                 : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -101,7 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             type="button"
             onClick={() => setLanguage(isJa ? "vi" : "ja")}
             title={isJa ? "Tiếng Việtに切り替え" : "Chuyển sang tiếng Nhật"}
-            className="flex items-center space-x-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-full py-1.5 px-3 shadow-sm text-xs font-bold text-slate-700 transition-colors"
+            className="flex items-center space-x-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded-full py-1.5 px-3 shadow-sm text-xs font-bold text-slate-700 transition-colors cursor-pointer"
           >
             <Languages className="h-4 w-4 text-blue-600" />
             <span>{isJa ? "VI" : "日本語"}</span>

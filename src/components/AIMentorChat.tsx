@@ -281,7 +281,9 @@ export const AIMentorChat: React.FC<AIMentorChatProps> = ({
                 id={`chat-prompt-chip-${idx}`}
                 onClick={() => handleSend(p)}
                 disabled={isLoading}
-                className="px-2.5 py-1 text-[10px] md:text-xs font-sans text-slate-655 bg-white hover:bg-slate-100 hover:text-slate-900 border border-slate-200 hover:border-slate-350 rounded-md transition-all text-left truncate max-w-[280px] cursor-pointer inline-flex items-center space-x-1 shadow-2xs font-semibold"
+                className={`px-2.5 py-1 text-[10px] md:text-xs font-sans text-slate-655 bg-white hover:bg-slate-100 hover:text-slate-900 border border-slate-200 hover:border-slate-350 rounded-md transition-all text-left truncate max-w-[280px] inline-flex items-center space-x-1 shadow-2xs font-semibold ${
+                  isLoading ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+                }`}
               >
                 <Sparkles className="h-2.5 w-2.5 text-blue-500 shrink-0" />
                 <span>{p}</span>
