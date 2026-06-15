@@ -189,6 +189,104 @@ const jaRecommendationBase: Record<string, Omit<CareerRecommendation, "percentag
   },
 };
 
+const viRecommendationBase: Record<string, Omit<CareerRecommendation, "percentageMatch" | "suitabilityScore" | "isAiGenerated" | "scores" | "aiError">> = {
+  web: {
+    matchedDomain: "web",
+    analysisSummary: "Bạn có xu hướng yêu thích việc xây dựng giao diện trực quan, tối ưu trải nghiệm người dùng và thiết kế hệ thống web phục vụ nhiều người truy cập. Phát triển Web, bao gồm Frontend, Backend hoặc Fullstack, là lựa chọn phù hợp nếu bạn muốn biến ý tưởng thành sản phẩm thực tế nhanh chóng.",
+    prosAndCons: [
+      { pro: "Thị trường tuyển dụng lớn, dễ thể hiện năng lực qua sản phẩm và portfolio.", con: "Công nghệ thay đổi nhanh, cần duy trì thói quen tự học liên tục." },
+      { pro: "Dễ bắt đầu, kết quả hiển thị trực quan ngay trên trình duyệt.", con: "Cạnh tranh khá cao ở nhóm Fresher/Junior." },
+    ],
+    marketOutlook: {
+      demand: "Rất cao. Hầu hết doanh nghiệp hiện đại đều cần nền tảng web, dashboard, API hoặc hệ thống cloud.",
+      salary: "12 - 35 triệu VND / tháng cho cấp độ Mid-level",
+      trends: "Next.js, Serverless, SSR, WebAssembly và kiến trúc cloud-native",
+    },
+    actionableTips: [
+      "Củng cố HTML, CSS và JavaScript trước khi học framework.",
+      "Học React/Next.js cho Frontend và Node.js/Express cho Backend.",
+      "Xây dựng một dự án hoàn chỉnh như blog cá nhân, dashboard hoặc trang thương mại điện tử nhỏ.",
+    ],
+    customMessage: "Thế giới Web là nơi bạn có thể biến ý tưởng thành sản phẩm rất nhanh. Hãy bắt đầu từ một giao diện nhỏ và nâng dần thành hệ thống hoàn chỉnh.",
+  },
+  mobile: {
+    matchedDomain: "mobile",
+    analysisSummary: "Bạn hứng thú với việc tạo ra các ứng dụng nằm trong tay người dùng mỗi ngày. Lập trình Di động phù hợp với bạn nếu bạn quan tâm đến trải nghiệm mượt mà, thông báo, lưu trữ offline, hiệu năng và cảm giác tương tác trực tiếp trên thiết bị.",
+    prosAndCons: [
+      { pro: "Có thể tự phát hành sản phẩm, làm freelance hoặc tham gia dự án quốc tế.", con: "Phải xử lý khác biệt giữa iOS/Android và các yêu cầu của app store." },
+      { pro: "Chuyên môn rõ ràng, dễ nổi bật nếu làm tốt UI/UX và hiệu năng.", con: "Cần test trên nhiều thiết bị và tối ưu tài nguyên cẩn thận." },
+    ],
+    marketOutlook: {
+      demand: "Cao. FinTech, giáo dục, y tế, thương mại điện tử và logistics đều có nhu cầu ứng dụng di động.",
+      salary: "15 - 40 triệu VND / tháng",
+      trends: "Flutter, React Native, Kotlin, Swift và tối ưu trải nghiệm người dùng trên mobile",
+    },
+    actionableTips: [
+      "Chọn một hướng chính: Flutter/React Native hoặc Native Kotlin/Swift.",
+      "Luyện state management, gọi API, lưu dữ liệu local và push notification.",
+      "Hoàn thiện một ứng dụng nhỏ đủ đẹp để đưa vào GitHub hoặc chuẩn bị phát hành store.",
+    ],
+    customMessage: "Mỗi dòng code của bạn có thể trở thành trải nghiệm quen thuộc trên điện thoại của người dùng. Hãy bắt đầu bằng một app nhỏ nhưng thật chỉn chu.",
+  },
+  ai: {
+    matchedDomain: "ai",
+    analysisSummary: "Bạn bị thu hút bởi dữ liệu, mô hình dự đoán và khả năng tự động hóa thông minh. AI & Data Science phù hợp nếu bạn thích tư duy phân tích, thử nghiệm, toán học ứng dụng và muốn xây dựng hệ thống có khả năng học từ dữ liệu.",
+    prosAndCons: [
+      { pro: "Tiềm năng tăng trưởng mạnh, mức thu nhập cao và nhiều hướng ứng dụng mới.", con: "Cần nền tảng toán, thống kê và xử lý dữ liệu vững chắc." },
+      { pro: "LLM, RAG và AI Agent đang mở ra nhiều cơ hội sản phẩm thực tế.", con: "Cần kiên trì thử nghiệm, đánh giá và cải thiện mô hình." },
+    ],
+    marketOutlook: {
+      demand: "Tăng rất nhanh khi doanh nghiệp áp dụng Generative AI, phân tích dữ liệu và tự động hóa.",
+      salary: "20 - 60 triệu VND / tháng hoặc cao hơn tùy năng lực",
+      trends: "LLM, RAG, AI Agent, MLOps, Computer Vision và NLP",
+    },
+    actionableTips: [
+      "Học Python, NumPy, Pandas và trực quan hóa dữ liệu.",
+      "Ôn lại đại số tuyến tính, xác suất thống kê và các khái niệm tối ưu hóa.",
+      "Bắt đầu với Scikit-learn trước khi tiến lên PyTorch hoặc TensorFlow.",
+    ],
+    customMessage: "AI đang thay đổi cách phần mềm tạo ra giá trị. Đi chậm mà chắc với nền tảng dữ liệu, bạn sẽ có lợi thế rất lớn.",
+  },
+  embedded: {
+    matchedDomain: "embedded",
+    analysisSummary: "Bạn có hứng thú với việc phần mềm điều khiển cảm biến, động cơ, vi điều khiển và các thiết bị trong thế giới thực. Hệ thống Nhúng & IoT phù hợp nếu bạn thích kết hợp phần cứng và phần mềm để tạo ra sản phẩm hữu hình.",
+    prosAndCons: [
+      { pro: "Chuyên môn sâu, có nhu cầu trong ô tô, robot, IoT, bán dẫn và tự động hóa.", con: "Cần chuẩn bị kit thực hành, linh kiện và đôi khi cả dụng cụ đo đạc." },
+      { pro: "Kỹ năng tầng thấp khó bị thay thế và rất có giá trị trong sản phẩm công nghiệp.", con: "Cần nắm C/C++, bộ nhớ, thanh ghi, giao tiếp phần cứng và đọc mạch." },
+    ],
+    marketOutlook: {
+      demand: "Cao và ổn định. EV, nhà máy thông minh, IoT và bán dẫn đều cần kỹ sư nhúng.",
+      salary: "14 - 38 triệu VND / tháng",
+      trends: "ESP32, STM32, FreeRTOS, TinyML, RISC-V và hệ thống xe điện",
+    },
+    actionableTips: [
+      "Học chắc C/C++, con trỏ, bitwise và quản lý bộ nhớ.",
+      "Thực hành với Arduino, ESP32 hoặc STM32 qua LED, cảm biến và giao tiếp serial.",
+      "Làm một dự án nhỏ dùng I2C/SPI/UART, PWM hoặc interrupt.",
+    ],
+    customMessage: "Code của bạn không chỉ nằm trên màn hình, mà có thể làm thiết bị thật chuyển động. Hãy bắt đầu từ một mạch nhỏ và nâng dần độ phức tạp.",
+  },
+  cyber: {
+    matchedDomain: "cyber",
+    analysisSummary: "Bạn có xu hướng quan sát hệ thống dưới góc nhìn rủi ro, điểm yếu và cách phòng thủ. Cybersecurity phù hợp nếu bạn thích phân tích, giải đố, hiểu cách hệ thống bị tấn công và xây dựng lớp bảo vệ an toàn hơn.",
+    prosAndCons: [
+      { pro: "Nhu cầu cao trong ngân hàng, doanh nghiệp, chính phủ và hạ tầng số.", con: "Trách nhiệm lớn, đặc biệt khi xảy ra sự cố bảo mật." },
+      { pro: "Có nhiều hướng đi như Blue Team, Red Team, Cloud Security hoặc DevSecOps.", con: "Cần kiến thức rộng về mạng, hệ điều hành, web, mã hóa và vận hành hệ thống." },
+    ],
+    marketOutlook: {
+      demand: "Rất cao do ransomware, rò rỉ dữ liệu và chuyển đổi cloud ngày càng phổ biến.",
+      salary: "18 - 50 triệu VND / tháng",
+      trends: "Zero Trust, Cloud Security, DevSecOps, SOC và bảo mật AI",
+    },
+    actionableTips: [
+      "Nắm vững TCP/IP, Linux và nền tảng Web.",
+      "Học OWASP Top 10 theo cả hướng khai thác và phòng chống.",
+      "Luyện tập có đạo đức trên TryHackMe, Hack The Box hoặc các bài CTF.",
+    ],
+    customMessage: "Một hệ thống tốt cần người hiểu sâu để bảo vệ nó. Hãy giữ tinh thần đạo đức, tò mò và kỷ luật khi bước vào lĩnh vực bảo mật.",
+  },
+};
+
 const jaCareerPathText: Record<string, Partial<CareerPathData>> = {
   web: {
     title: "Web開発者 (Web Developer)",
@@ -478,9 +576,10 @@ export const localizeRecommendation = (
   recommendation: CareerRecommendation,
   language: Language
 ): CareerRecommendation => {
-  if (language === "vi") return recommendation;
-
-  const base = jaRecommendationBase[recommendation.matchedDomain];
+  const base =
+    language === "ja"
+      ? jaRecommendationBase[recommendation.matchedDomain]
+      : viRecommendationBase[recommendation.matchedDomain];
   if (!base) return recommendation;
 
   return {

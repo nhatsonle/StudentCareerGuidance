@@ -37,7 +37,7 @@ export default function App() {
 
   const [activeRecommendation, setActiveRecommendation] = useState<CareerRecommendation | null>(() => {
     const saved = localStorage.getItem("edupath_recommendation");
-    return saved ? JSON.parse(saved) : null;
+    return saved ? localizeRecommendation(JSON.parse(saved), language) : null;
   });
 
   // 2. SYNCHRONIZE STATES TO LOCAL STORAGE
