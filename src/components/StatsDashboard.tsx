@@ -21,7 +21,7 @@ interface StatsDashboardProps {
   setSelectedPathId: (pathId: string) => void;
   completedMilestones: string[];
   activeRecommendation: CareerRecommendation | null;
-  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
+  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap") => void;
   completionRate: number;
   language: Language;
 }

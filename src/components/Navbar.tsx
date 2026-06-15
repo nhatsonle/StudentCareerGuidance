@@ -1,10 +1,10 @@
 import React from "react";
-import { GraduationCap, Award, Compass, MessageSquare, Flame, Languages } from "lucide-react";
+import { GraduationCap, Award, Compass, Flame, Languages } from "lucide-react";
 import { getCareerPaths, Language } from "../i18n";
 
 interface NavbarProps {
-  activeTab: "dashboard" | "assessment" | "roadmap" | "chat";
-  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
+  activeTab: "dashboard" | "assessment" | "roadmap";
+  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap") => void;
   selectedPathId: string;
   completionRate: number;
   language: Language;
@@ -82,18 +82,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>{isJa ? "ロードマップ" : "Sơ Đồ Lộ Trình"}</span>
           </button>
 
-          <button
-            id="nav-btn-chat"
-            onClick={() => setActiveTab("chat")}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
-              activeTab === "chat"
-                ? "bg-blue-50 text-blue-700 border border-blue-100/80 shadow-sm"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-            }`}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>{isJa ? "AIメンター" : "AI Career Mentor"}</span>
-          </button>
         </nav>
 
         <div className="flex items-center space-x-2">

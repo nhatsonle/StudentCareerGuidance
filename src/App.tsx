@@ -3,16 +3,16 @@ import { Navbar } from "./components/Navbar";
 import { StatsDashboard } from "./components/StatsDashboard";
 import { AssessmentCenter } from "./components/AssessmentCenter";
 import { InteractiveRoadmap } from "./components/InteractiveRoadmap";
-import { AIMentorChat } from "./components/AIMentorChat";
-import { CareerRecommendation, ChatMessage } from "./types";
+import { CareerRecommendation } from "./types";
 import { GraduationCap } from "lucide-react";
 import {
   getCareerPaths,
-  getInitialAssistantMessage,
   isLanguage,
   Language,
   localizeRecommendation,
 } from "./i18n";
+
+type ActiveTab = "dashboard" | "assessment" | "roadmap";
 
 export default function App() {
   // 1. STATE INITIALIZATION (SYNCED WITH LOCALSTORAGE)
@@ -21,9 +21,9 @@ export default function App() {
     return isLanguage(saved) ? saved : "vi";
   });
 
-  const [activeTab, setActiveTab] = useState<"dashboard" | "assessment" | "roadmap" | "chat">(() => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     const saved = localStorage.getItem("edupath_active_tab");
-    return (saved as any) || "dashboard";
+    return saved === "assessment" || saved === "roadmap" ? saved : "dashboard";
   });
 
   const [selectedPathId, setSelectedPathId] = useState<string>(() => {
@@ -38,21 +38,6 @@ export default function App() {
   const [activeRecommendation, setActiveRecommendation] = useState<CareerRecommendation | null>(() => {
     const saved = localStorage.getItem("edupath_recommendation");
     return saved ? JSON.parse(saved) : null;
-  });
-
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => {
-    const saved = localStorage.getItem("edupath_chat_messages");
-    if (saved) return JSON.parse(saved);
-
-    // Initial warm greeting message
-    return [
-      {
-        id: "welcome-1",
-        role: "assistant",
-        content: getInitialAssistantMessage(language),
-        timestamp: new Date()
-      }
-    ];
   });
 
   // 2. SYNCHRONIZE STATES TO LOCAL STORAGE
@@ -75,17 +60,6 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("edupath_recommendation", JSON.stringify(activeRecommendation));
   }, [activeRecommendation]);
-
-  useEffect(() => {
-    localStorage.setItem("edupath_chat_messages", JSON.stringify(chatMessages));
-  }, [chatMessages]);
-
-  useEffect(() => {
-    setChatMessages((prev) => {
-      if (prev.length !== 1 || prev[0].id !== "welcome-1") return prev;
-      return [{ ...prev[0], content: getInitialAssistantMessage(language), timestamp: new Date() }];
-    });
-  }, [language]);
 
   useEffect(() => {
     setActiveRecommendation((prev) =>
@@ -177,14 +151,6 @@ export default function App() {
           />
         )}
 
-        {activeTab === "chat" && (
-          <AIMentorChat
-            chatMessages={chatMessages}
-            setChatMessages={setChatMessages}
-            activeRecommendation={activeRecommendation}
-            language={language}
-          />
-        )}
       </main>
 
       {/* Modern, non-obstructive tech Portal Footer */}

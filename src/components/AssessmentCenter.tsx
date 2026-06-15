@@ -23,7 +23,7 @@ interface AssessmentCenterProps {
   onRecommendationReceived: (recommendation: CareerRecommendation) => void;
   onRestartAssessment: () => void;
   activeRecommendation: CareerRecommendation | null;
-  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap" | "chat") => void;
+  setActiveTab: (tab: "dashboard" | "assessment" | "roadmap") => void;
   setSelectedPathId: (pathId: string) => void;
   language: Language;
 }
